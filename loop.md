@@ -21,10 +21,13 @@ Claude coaches — approach, review, one hint at a time — unless I explicitly 
   - [x] Three-panel chart (one y-axis per metric)
   - [ ] Markdown cell under the chart with the numbers behind it
 - [ ] **Q2 (grouping)** — 15 countries with highest `child_mort` + lowest `gdpp`
-  - [ ] Decide how "combined" is defined (rank-sum? filter then sort? percentile score?)
-  - [ ] Result shape: 15 rows, country + both metrics, ordered by the combined criterion
-  - [ ] Chart or table — whichever actually communicates the shortlist
-  - [ ] Markdown cell with the finding
+  - [x] Decide how "combined" is defined (rank-sum? filter then sort? percentile score?)
+    - currently a lexicographic sort: `child_mort` desc, `gdpp` asc. `gdpp` only breaks
+      exact ties, so in practice this is top-15 by `child_mort` alone — revisit if the
+      shortlist is meant to weigh both
+  - [x] Result shape: 15 rows, country + both metrics, ordered by the combined criterion
+  - [x] Chart or table — whichever actually communicates the shortlist
+  - [ ] Markdown cell with the finding — prose is written, still needs the numbers behind it
 - [ ] **Q3 (visualization)** — `income` vs `life_expec`, coloured by `child_mort`
   - [ ] Log x-axis for `income`; `PowerNorm` on the colour scale (`child_mort` is skewed)
   - [ ] Say whether it's linear or plateaus, and where the bend is
