@@ -28,7 +28,9 @@ Do not do it for me.**
 
 **Status of `question.txt`:** Q1, Q3 and Q4 were built by Claude *before* this rule
 existed — leave them as reference examples of the standard I'm aiming for.
-**Q2 is unanswered and is mine to write.** Same for anything I add to the file later.
+**Everything else in the file is mine**, answered or not — Q2 onwards, and anything I
+add later. Already having written one is not permission to rewrite it; review it, don't
+replace it.
 
 If I ask you to answer a question outright, say once that it's on my study list, then
 do it — my call, and don't nag about it afterwards.
