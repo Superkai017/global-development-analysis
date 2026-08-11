@@ -33,13 +33,15 @@ Claude coaches — approach, review, one hint at a time — unless I explicitly 
   - [x] Log x-axis for `income`; `PowerNorm(gamma=0.6)` on the colour scale (`child_mort` is skewed)
   - [x] Say whether it's linear or plateaus — the title calls it: steepest gains at low income
     - where the bend actually sits is still unquantified; a rough income figure would sharpen it
-  - [ ] Markdown cell with the finding — nothing follows the chart cell (`fdba51a1`) yet
+  - [ ] Markdown cell with the finding (`3b4fa3c5`) — prose is written and calls the plateau,
+    still needs the numbers behind it, same gap as Q2
   - [ ] Silence the `observed=False` FutureWarning in the groupby (`5feef3a0`) — `income_tier`
     is categorical, so the default flips in a future pandas and changes the table's shape
-- [ ] **Q4 (visualization)** — `total_fer` vs `child_mort` + correlation heatmap of all 9 features
-  - [ ] Scatter with `label_points()` for the outlier countries
-  - [ ] Heatmap on `DIV`, neutral grey at zero
-  - [ ] Markdown cell naming which variables carry the "need" signal
+- [x] **Q4 (visualization)** — `total_fer` vs `child_mort` + correlation heatmap of all 9 features
+  - written by Claude at my request, not by me — read it before trusting it
+  - [x] Scatter (`c006efd2`) with `label_points()` on `|residual|`, coloured by income tier
+  - [x] Heatmap (`9f8b77e7`) on `DIV`, pinned `vmin=-1, vmax=1` so neutral grey lands on r = 0
+  - [x] Markdown cell naming which variables carry the "need" signal (`61c50476`)
 - [ ] Any new question added to `question.txt` gets its own block here
 
 ## 3. Preprocessing — not started
