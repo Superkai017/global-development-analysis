@@ -26,8 +26,9 @@ Do not do it for me.**
 - Ordinary engineering chores are also fair game: fixing a `NameError`, debugging an
   environment problem, tidying a chart's layout, explaining a traceback.
 
-**Status of `question.txt`:** Q1 and Q4 were built by Claude *before* this rule existed —
-leave them as reference examples of the standard I'm aiming for.
+**Status of `question.txt`:** Q1 and Q4 were built by Claude at my request, not by me —
+Q1 before this rule existed, Q4 (cells `c006efd2`, `9f8b77e7`, `61c50476`) by asking for
+it outright. Leave them as reference examples of the standard I'm aiming for.
 **Everything else is mine**, answered or not — Q2, Q3, and anything I add later.
 Q3's notebook work is mine too (cells `5feef3a0` and `fdba51a1`), so it gets the same
 treatment as the rest: review it, don't replace it. Already having written one is not
@@ -47,8 +48,30 @@ duplicates, one row per country.
 - `question.txt` — my study list (gitignored).
 - `loop.md` — the working checklist, and the source of truth for what's done.
 
-EDA covers Q1–Q3; Q4 is not started. Nothing is written yet for scaling, PCA, or
-clustering.
+EDA covers Q1–Q4. Nothing is written yet for scaling, PCA, or clustering.
+
+## Preprocessing — decisions I've already made
+
+**Keep it simple.** The aim is clustering that's stable, not a wide engineered feature
+set. Don't propose new derived variables unless I ask for them.
+
+- `country` is an **ID only** — it never enters the model matrix. Hold it aside as the
+  index or a label column. The matrix is the 9 numeric features.
+- **Log-transform the most right-skewed variables before scaling** — `income`, `gdpp`,
+  and probably `inflation`. Trap: `inflation` goes negative for 8 countries (Seychelles
+  −4.21, Ireland −3.22, …), so a bare `np.log` returns `NaN` there. It needs a signed or
+  shifted transform, or a different treatment altogether — `income` and `gdpp` are
+  strictly positive and have no such problem.
+- **Scale every numeric feature before clustering.** K-Means is Euclidean, so on raw
+  units `income` (to 125,000) would drown `total_fer` (1.15–7.49) outright.
+- Scaler choice: `StandardScaler` vs `RobustScaler`, on the grounds that the dataset has
+  clear outliers. **This one is unfinished** — my note trails off before naming the
+  outliers or picking. Ask me rather than assuming; `loop.md` §3 carries the open box.
+
+Q4 established the constraint these feed into: the 9 features are not 9 independent
+signals. `child_mort`/`total_fer`/`life_expec` move as one block (|r| = 0.76–0.89) and
+`income`/`gdpp` as another (0.90), so equal-weighted Euclidean distance is tilted toward
+"need" before any decision is made about it.
 
 ## Environment
 

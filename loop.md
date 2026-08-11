@@ -44,12 +44,29 @@ Claude coaches — approach, review, one hint at a time — unless I explicitly 
   - [x] Markdown cell naming which variables carry the "need" signal (`61c50476`)
 - [ ] Any new question added to `question.txt` gets its own block here
 
-## 3. Preprocessing — not started
+## 3. Preprocessing — approach decided, nothing written yet
 
-- [ ] Decide what to do about right-skew in `income`, `gdpp` (and `inflation`) — log-transform or leave
+Keep this simple: the aim is clustering that's stable, not a wide engineered feature set.
+No new derived variables unless there's a reason for one. Boxes stay unticked until the
+code is in the notebook.
+
+- [ ] Right-skew in `income`, `gdpp` (and `inflation`) — **decided: log-transform**, before scaling
+  - `income` skew 2.23 → −0.24 logged, `gdpp` 2.22 → 0.01. Both strictly positive, so plain `log` is safe
+  - `inflation` is the awkward one: skew 5.15, but **8 countries are negative** (Seychelles
+    −4.21, Ireland −3.22, Japan −1.90, Czech Republic −1.43, …), so a bare `np.log` gives
+    `NaN` for them. Needs a signed/shifted transform or a different treatment — open
 - [ ] Outlier check: Nigeria/Haiti at the high-`child_mort` end, Luxembourg/Qatar at the high-`income` end — keep or cap, and justify it
+  - logging `income`/`gdpp` already pulls the high-income tail in, so this is mostly about the `child_mort` end
 - [ ] Choose the scaler (`StandardScaler` vs `RobustScaler`) and write down why
+  - **decided: scale everything** — K-Means is Euclidean, and on raw units `income` (to 125,000)
+    drowns `total_fer` (1.15–7.49)
+  - which scaler is **still open**: the argument was heading toward the outliers mattering,
+    but the note stops before naming them or picking one. Resolve before ticking
 - [ ] Confirm the feature matrix: 9 numeric columns, `country` held aside as the index/label
+  - **decided: `country` is an ID only**, never in the model matrix
+- Constraint carried over from Q4: the 9 features are not 9 independent signals
+  (`child_mort`/`total_fer`/`life_expec` at |r| = 0.76–0.89; `income`/`gdpp` at 0.90), so
+  equal-weighted distance is tilted toward "need" whatever the scaler ends up being
 
 ## 4. PCA — not started
 
