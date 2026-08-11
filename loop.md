@@ -28,10 +28,14 @@ Claude coaches — approach, review, one hint at a time — unless I explicitly 
   - [x] Result shape: 15 rows, country + both metrics, ordered by the combined criterion
   - [x] Chart or table — whichever actually communicates the shortlist
   - [ ] Markdown cell with the finding — prose is written, still needs the numbers behind it
-- [ ] **Q3 (visualization)** — `income` vs `life_expec`, coloured by `child_mort`
-  - [ ] Log x-axis for `income`; `PowerNorm` on the colour scale (`child_mort` is skewed)
-  - [ ] Say whether it's linear or plateaus, and where the bend is
-  - [ ] Markdown cell with the finding
+- [x] **Q3 (visualization)** — `income` vs `life_expec`, coloured by `child_mort`
+  - [x] Tier summary table: mean `life_expec` + `child_mort` per income tier
+  - [x] Log x-axis for `income`; `PowerNorm(gamma=0.6)` on the colour scale (`child_mort` is skewed)
+  - [x] Say whether it's linear or plateaus — the title calls it: steepest gains at low income
+    - where the bend actually sits is still unquantified; a rough income figure would sharpen it
+  - [ ] Markdown cell with the finding — nothing follows the chart cell (`fdba51a1`) yet
+  - [ ] Silence the `observed=False` FutureWarning in the groupby (`5feef3a0`) — `income_tier`
+    is categorical, so the default flips in a future pandas and changes the table's shape
 - [ ] **Q4 (visualization)** — `total_fer` vs `child_mort` + correlation heatmap of all 9 features
   - [ ] Scatter with `label_points()` for the outlier countries
   - [ ] Heatmap on `DIV`, neutral grey at zero

@@ -26,11 +26,12 @@ Do not do it for me.**
 - Ordinary engineering chores are also fair game: fixing a `NameError`, debugging an
   environment problem, tidying a chart's layout, explaining a traceback.
 
-**Status of `question.txt`:** Q1, Q3 and Q4 were built by Claude *before* this rule
-existed — leave them as reference examples of the standard I'm aiming for.
-**Everything else in the file is mine**, answered or not — Q2 onwards, and anything I
-add later. Already having written one is not permission to rewrite it; review it, don't
-replace it.
+**Status of `question.txt`:** Q1 and Q4 were built by Claude *before* this rule existed —
+leave them as reference examples of the standard I'm aiming for.
+**Everything else is mine**, answered or not — Q2, Q3, and anything I add later.
+Q3's notebook work is mine too (cells `5feef3a0` and `fdba51a1`), so it gets the same
+treatment as the rest: review it, don't replace it. Already having written one is not
+permission to rewrite it.
 
 If I ask you to answer a question outright, say once that it's on my study list, then
 do it — my call, and don't nag about it afterwards.
@@ -44,8 +45,10 @@ duplicates, one row per country.
 - `data/Country-data.csv` — the dataset. Full data dictionary is in `README.md`.
 - `notebook/eda.ipynb` — the only notebook. Data understanding, then EDA per question.
 - `question.txt` — my study list (gitignored).
+- `loop.md` — the working checklist, and the source of truth for what's done.
 
-Nothing is written yet for scaling, PCA, or clustering.
+EDA covers Q1–Q3; Q4 is not started. Nothing is written yet for scaling, PCA, or
+clustering.
 
 ## Environment
 
