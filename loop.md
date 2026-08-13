@@ -123,9 +123,9 @@ top-to-bottom.
   ('Elbow Method — Inertia vs Number of Clusters', 'Country Segments — PCA 2D Projection'),
   and no chart has a markdown cell with the numbers under it — the two markdown cells present
   (`be49699f`, `29398e25`) are bare labels
-- [ ] Saved outputs are stale and mutually inconsistent — `eacd0c7a` shows the k=3 run while
-  `6223cf1d` and `5fb276fe` still show k=4's 42 / 25 / 66 / 34. Restart & Run All before
-  committing, or the notebook contradicts itself in the diff
+- [x] Saved outputs are consistent — resolved by a Restart & Run All before commit `7139368`.
+  Execution counts run 1–13 in order with no error outputs, and every cell now reports the
+  same k=3 run (52 / 72 / 43). They previously mixed k=3 and k=4 results in one file
 
 ## 5. PCA — fitted, not yet read
 
@@ -191,23 +191,46 @@ top-to-bottom.
   - `136bbda4` in 2D on PC1/PC2, `462f68ec` in 3D on PC1/PC2/PC3, coloured by segment
   - [ ] points carry no country names — `label_points()` from `eda.ipynb` is the tool, and it
     needs the setup cell brought across first (§4)
-- [ ] Produce the aid shortlist — which countries fall in the neediest cluster
-  - unblocked: `countries[X['Cluster'] == cid]` names any cluster. `d189ff6b` prints the five
-    richest and poorest per cluster and `5fb276fe` prints the whole highest-PC1 cluster, but
-    the shortlist itself — the 43 countries in Least developed — still needs pulling out,
-    ordering, and writing down as the answer
-- [ ] Sanity check: does the shortlist agree with the Q2 shortlist? Explain any difference
+- [x] Produce the aid shortlist — which countries fall in the neediest cluster
+  - all 43 Least-developed countries are written out in `README.md`, ordered by child mortality
+  - the cluster spans $231 – $3,600 gdpp, and its *lowest* child mortality is Nepal at 47.0 —
+    2.4× the global median of 19.3, so it separates cleanly on the metric the question is about
+  - [ ] it lives in the README, not in the notebook. `d189ff6b` still only prints the five
+    richest and poorest per cluster — a cell that emits the ordered 43 belongs here too
+- [x] Sanity check: does the shortlist agree with the Q2 shortlist? Explain any difference
+  - **14 of Q2's 15 fall inside the Least-developed cluster** with no supervision
+  - the one disagreement is **Equatorial Guinea** — 111 child deaths per 1,000 but $33,700
+    income and $17,100 gdpp — which clusters as Emerging. Q2's lexicographic sort ranked it on
+    mortality alone; the clustering reads all 9 indicators and sees a wealthy state with bad
+    health outcomes. The two methods disagreeing isolates the one country whose need and wealth
+    signals point opposite ways
 
 ## 8. Wrap-up
 
-- [ ] Update `README.md` — the repo-structure block describes a layout that doesn't exist:
-  `data/Country-data.csv` (now `data/raw_data/`), `notebooks/country_clustering.ipynb` (now
-  three notebooks under `notebook/`), `src/`, `requirements.txt`. `data/preprocessed_data/`
-  isn't mentioned at all and it's tracked
-- [ ] Write a `requirements.txt` (or note in the README that it's `py -3.13`, no venv)
-- [ ] Restart-and-run-all: each notebook executes clean from a fresh kernel
+- [x] Update `README.md` — rewritten around the project flow: dataset, the four EDA questions
+  with their numbers, the preprocessing table, k selection, PCA loadings, the three segments in
+  **original units**, the 43-country shortlist, the Q2 cross-check, and a Limitations section.
+  The repo-structure block now matches reality (`src/` and `notebooks/` are gone from it)
+  - real-unit cluster means were obtained by joining labels back to the raw CSV, since the
+    notebook profile is still in transformed space (§7)
+- [x] Ten figures exported to `docs/images/` and embedded in the README (~828 KB)
+  - produced by running the notebooks' own chart cells under `Agg` and saving instead of
+    showing, so they track the committed code. Regenerate after any chart or `k` change
+  - not lifted from the stored notebook outputs on purpose: eda's two Q4 charts had no saved
+    image at all, and modelling's four were left over from the superseded k=4 run
+- [x] Note the environment in the README — `py -3.13`, no venv, no `requirements.txt`, and the
+  dependency list. An actual `requirements.txt` is still unwritten if you want one
+- [x] Restart-and-run-all: each notebook executes clean from a fresh kernel
+  - `modelling.ipynb` — user's own restart before `7139368`, exec 1–13, no error outputs
+  - `eda.ipynb` — all code cells run to completion during the figure export, exit 0
+  - `preprocessing.ipynb` — exit 0, and **reproduces the committed CSV exactly** (save path
+    redirected to scratch, then compared: same shape, same column order, same index order,
+    max absolute difference 0.0). The tracked model matrix is genuinely regenerable
 - [ ] Final read-through: every chart title states a finding, no clipped labels
-- [ ] Commit
+  - the ten exported figures were each looked at: nine clean, and the PCA 3D was cropped to its
+    content bounds (1210×880 → 968×689) because `subplots_adjust` left ~30% dead margin
+  - still open: chart *titles* in `modelling.ipynb` name variables rather than state findings (§4)
+- [ ] Commit — `README.md` and `docs/` are untracked/uncommitted as of this check
 
 ---
 

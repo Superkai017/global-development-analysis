@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(py -3.13 \"C:\\\\Users\\\\MSI\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Country-development-analysis-global-development-analysis\\\\ac5bf0fd-c023-4120-bd68-947e748beab4\\\\scratchpad\\\\check_labels.py\")"
-    ]
-  }
-}
