@@ -93,47 +93,109 @@ new frame so the cells are re-runnable. Output is `data/preprocessed_data/prepro
   (`child_mort`/`total_fer`/`life_expec` at |r| = 0.76–0.89; `income`/`gdpp` at 0.90), so
   equal-weighted distance is still tilted toward "need" whatever the scaler does
 
-## 4. Modelling notebook — scaffolded only
+## 4. Modelling notebook — K-Means and PCA in, runs clean
 
-`notebook/modelling.ipynb` is two cells: the imports (`1e89ee29`) and the data load (`40941ec2`).
+`notebook/modelling.ipynb` is 15 cells (13 code, 2 markdown labels): imports (`1e89ee29`),
+load (`40941ec2`), the country split and `features` pin (`b6e1d698`), elbow (`ab0cb33a`),
+metric table (`0d6c67c4`), metric charts (`037f92bd`), the k=3 fit (`eacd0c7a`), profile and
+naming (`1ecfcb11`), per-cluster richest/poorest (`d189ff6b`), PCA 2D (`136bbda4`), PCA 3D
+(`462f68ec`), per-cluster silhouette (`6223cf1d`), PC1 cross-check (`5fb276fe`).
 
-- [ ] Load with `pd.read_csv(data, index_col='country')` — right now country comes back as a
-  plain column, so it lands in the model matrix as a non-numeric feature
+Checked 2026-08-13: code cells extracted in order and run under `Agg` — exit 0, clean
+top-to-bottom.
+
+- [x] Country names survive the load — `b6e1d698` takes `countries = df['country'].copy()`
+  before dropping the column, so `countries[mask]` names any subset of `X`. Not the
+  `index_col='country'` route CLAUDE.md describes, but it solves the same problem: the Series
+  and `X` both keep the original `RangeIndex`, and that alignment is what makes it work
+- [x] `features` pinned once from `df.columns` in `b6e1d698`, and every fit and score takes
+  `X[features]`. `X` accumulates `Cluster`, `PC1`, `PC2`, `PC3` as the notebook runs, so
+  deriving the feature list from `X.columns` later silently fed those back in as model inputs
 - [ ] Swap the absolute `D:\Country-development-analysis\…` path for a relative one, the way
   `preprocessing.ipynb` does (`Path('..') / 'data' / …`) — `eda.ipynb` (`1ff645e7`) has the
   same absolute path and the same fix
-- [ ] `StandardScaler` / `PowerTransformer` are imported but the data arrives already scaled —
-  drop them unless something actually re-fits
+- [ ] `StandardScaler` / `PowerTransformer` are imported but nothing re-fits them — still dead
+  imports. `PCA` has stopped being one (§5)
 - [ ] No chart tokens in this notebook: `SURFACE`, `SEQ`, `style()`, `label_points()` all live
-  in `eda.ipynb` cell `09fffd3d`. First chart cell here needs them copied in or the setup
-  cell repeated
+  in `eda.ipynb` cell `09fffd3d`. The four chart cells here use bare matplotlib defaults plus
+  literal `'steelblue'` / `'salmon'` and seaborn's `Set2`
+- [ ] Chart conventions not applied yet: titles name variables rather than state a finding
+  ('Elbow Method — Inertia vs Number of Clusters', 'Country Segments — PCA 2D Projection'),
+  and no chart has a markdown cell with the numbers under it — the two markdown cells present
+  (`be49699f`, `29398e25`) are bare labels
+- [ ] Saved outputs are stale and mutually inconsistent — `eacd0c7a` shows the k=3 run while
+  `6223cf1d` and `5fb276fe` still show k=4's 42 / 25 / 66 / 34. Restart & Run All before
+  committing, or the notebook contradicts itself in the diff
 
-## 5. PCA — not started
+## 5. PCA — fitted, not yet read
 
-- [ ] Fit PCA on the scaled matrix
+- [x] Fit PCA on the scaled matrix — `136bbda4` (2 components) and `462f68ec` (3), both on
+  `X[features]` so the `Cluster` column can't leak into the decomposition
 - [ ] Scree / cumulative-variance plot, pick the number of components
+  - the numbers are printed but never plotted: PC1 49.55%, PC2 18.69%, PC3 14.30%,
+    cumulative 82.54%. n_components was chosen to be plottable (2D, then 3D), not from a scree
 - [ ] Read the loadings — what does PC1 actually mean in development terms?
+  - printed in both cells, not written up anywhere. PC1 is the "need" axis Q4 predicted:
+    life_expec +0.435, child_mort −0.429, total_fer −0.402, income +0.366, gdpp +0.362 — the
+    two correlated blocks loading together with opposite signs
+  - PC2 is trade openness almost by itself (imports +0.696, exports +0.591), which is the same
+    signal §3 spent the Yeo-Johnson work stopping from dominating Euclidean distance
+  - PC3 is health +0.649 against inflation −0.636
 - [ ] Decide: cluster on components or on the scaled features
+  - currently clustering on all 9 scaled features and using PCA only to *display* the result.
+    That's a defensible choice, but it is a choice and it isn't written down
+- [ ] `136bbda4` and `462f68ec` both fit PCA and both write `PC1`/`PC2`. Harmless — components
+  don't change with `n_components` — but one of the two should go
 
-## 6. Clustering — not started
+## 6. Clustering — K-Means at k=3, hierarchical not started
 
 - [ ] K-Means: elbow (inertia) + silhouette to choose `k`
-  - `silhouette_score`, `calinski_harabasz_score` and `davies_bouldin_score` are already
-    imported in `1e89ee29` — three metrics, so say which one is deciding
-  - for reference: the ad-hoc k=3 run during the preprocessing debugging gave 43 / 72 / 52
-    and held across seeds. That was a sanity check, not committed work — it still needs
-    doing properly here
+  - [x] Elbow over k = 2–10, `n_init=10`, `random_state=42`, on `X[features]` (`ab0cb33a`)
+  - [x] All three metrics computed and tabled (`0d6c67c4`); silhouette and Davies-Bouldin
+    plotted side by side (`037f92bd`)
+  - [x] k = 3 fitted (`eacd0c7a`) — cluster sizes 52 / 72 / 43. Matches the ad-hoc k=3 run from
+    the preprocessing debugging (43 / 72 / 52), which held across seeds
+  - [x] re-runnable: fits on `X[features]`, so a second run can't cluster on `Cluster` or the
+    PC columns the way it used to
+  - [x] Per-cluster silhouette (`6223cf1d`) — means 0.252 / 0.209 / 0.256, minimums
+    −0.004 / 0.000 / −0.060. Nothing badly misassigned; cluster 1, the 72-country middle, is
+    the loosest, which is what you'd expect of a residual "everyone else" group
+  - [ ] **Say which metric is deciding, and write down why k=3** — the table still doesn't
+    hand it to you. Silhouette peaks at k=2 (0.3261 against 0.2345 at k=3), Davies-Bouldin is
+    also best at k=2 (1.2203 against 1.4401), and Calinski-Harabasz falls monotonically. k=3 is
+    defensible on interpretability — it maps onto least-developed / emerging / developed and
+    the aid question needs more than a two-way split — but that argument has to be written
 - [ ] Hierarchical: dendrogram, pick the cut, compare the grouping to K-Means
-- [ ] Lock in a final labelling and attach it to `df`
+  - `scipy` is available but nothing is imported for it yet in `1e89ee29`
+- [x] Lock in a final labelling and attach it to `df`
+  - `1ecfcb11` orders clusters by `dev_score` ascending, zips that order to `tiers`, and
+    attaches `df['Segment'] = X['Cluster'].map(segment)`. Alignment works because `X = df.copy()`
+    keeps the same `RangeIndex` — it breaks the moment either frame is reindexed on country
+  - an `assert len(tiers) == k` guards the zip: a short `tiers` list used to drop a cluster
+    silently and leave `NaN`s in `Segment` (that's where the old `KeyError: 3` came from)
 
-## 7. Cluster profiling & the actual answer
+## 7. Cluster profiling & the actual answer — most of the way
 
 - [ ] Mean of each of the 9 indicators per cluster
-  - centroids are in transformed units — `inverse_transform` back through the scaler and the
-    `PowerTransformer` before quoting a number as a percentage or a dollar figure
-- [ ] Name the clusters in plain language (e.g. "needs aid" / "developing" / "developed")
-- [ ] Scatter of the clusters on the two strongest axes, labelled
+  - [x] `profile = X.groupby('Cluster')[features].mean().round(2)` with an `n` column (`1ecfcb11`)
+  - [x] `dev_score` = gdpp + income + life_expec − child_mort − total_fer, used to rank the
+    clusters least → most developed. Only legitimate because all 9 features share a scale after
+    §3 — it would be meaningless on raw units
+  - [ ] still in transformed units — `inverse_transform` back through the scaler and the
+    `PowerTransformer` before quoting a number as a percentage or a dollar figure. Neither `pt`
+    nor `scaler` exists in this kernel, so this notebook has to re-fit or re-import them
+- [x] Name the clusters in plain language
+  - Least developed (43), Emerging (72), Developed (52). Assigned by `dev_score` rank rather
+    than hardcoded per cluster id, so they re-derive correctly if the seed or `k` changes
+- [x] Scatter of the clusters on the two strongest axes, labelled
+  - `136bbda4` in 2D on PC1/PC2, `462f68ec` in 3D on PC1/PC2/PC3, coloured by segment
+  - [ ] points carry no country names — `label_points()` from `eda.ipynb` is the tool, and it
+    needs the setup cell brought across first (§4)
 - [ ] Produce the aid shortlist — which countries fall in the neediest cluster
+  - unblocked: `countries[X['Cluster'] == cid]` names any cluster. `d189ff6b` prints the five
+    richest and poorest per cluster and `5fb276fe` prints the whole highest-PC1 cluster, but
+    the shortlist itself — the 43 countries in Least developed — still needs pulling out,
+    ordering, and writing down as the answer
 - [ ] Sanity check: does the shortlist agree with the Q2 shortlist? Explain any difference
 
 ## 8. Wrap-up
